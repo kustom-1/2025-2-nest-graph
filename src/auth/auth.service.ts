@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserInput } from './dto/create-user.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { LoginDto } from './dto/login.dto';
+import { LoginInput } from './dto/login.input';
 import { Jwt } from './interfaces/jwt.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -19,8 +19,8 @@ export class AuthService {
     private readonly jwtService: JwtService
   ){}
 
-  async create(createUserDto: CreateUserDto) {
-    const {password, ...userData }= createUserDto;
+  async create(createUserInput: CreateUserInput) {
+    const {password, ...userData }= createUserInput;
     try{
       const user = this.userRepository.create({
         ...userData,
@@ -30,22 +30,29 @@ export class AuthService {
       delete user.password;
       
       return {
-      ...user,
-      token: this.getJwtToken(
-        {id: user.id, 
-          email: user.email
-        })
-    };
+        user,
+        token: this.getJwtToken(
+          {id: user.id, 
+            email: user.email
+          })
+      };
     }catch(error){
       this.handleException(error);
     }
   }
 
-  async login(loginDto: LoginDto){
-    const {email, password} = loginDto;
+  async login(loginInput: LoginInput){
+    const {email, password} = loginInput;
     const user = await this.userRepository.findOne({
       where: {email},
-      select: {email: true, password: true, id:true}
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        fullName: true,
+        isActive: true,
+        roles: true
+      }
     })
 
     if(!user) throw new NotFoundException(`User ${email} not found`)
@@ -55,7 +62,7 @@ export class AuthService {
 
     delete user.password;
     return {
-      ...user,
+      user,
       token: this.getJwtToken(
         {id: user.id, 
           email: user.email

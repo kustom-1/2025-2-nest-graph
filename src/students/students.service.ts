@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException, Logger, NotFoundException, ParseUUIDPipe } from '@nestjs/common';
-import { CreateStudentDto } from './dto/create-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
+import { CreateStudentInput } from './dto/create-student.input';
+import { UpdateStudentInput } from './dto/update-student.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Student } from './entities/student.entity';
 import { DataSource, Repository } from 'typeorm';
-import { PaginationDto } from './dto/pagination.dto';
+import { PaginationArgs } from './dto/pagination.args';
 import { isUUID } from 'class-validator';
 import { Grade } from './entities/grade.entity';
 
@@ -20,9 +20,9 @@ export class StudentsService {
     private readonly dataSource: DataSource
   ){}
 
-  async create(createStudentDto: CreateStudentDto) {
+  async create(createStudentInput: CreateStudentInput) {
     try{
-      const { grades = [], ...studentDetails} = createStudentDto;
+      const { grades = [], ...studentDetails} = createStudentInput;
       const student = this.studentRepository.create({
         ...studentDetails,
         grade: grades.map(grade => this.gradeRepository.create(grade))
@@ -34,9 +34,9 @@ export class StudentsService {
     }
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(paginationArgs: PaginationArgs) {
     try{
-      const {limit, offset} = paginationDto;
+      const {limit = 10, offset = 0} = paginationArgs;
       return await this.studentRepository.find({
         take: limit,
         skip: offset
@@ -67,14 +67,15 @@ export class StudentsService {
     return student;
   }
 
-  async update(id: string, updateStudentDto: UpdateStudentDto) {
+  async update(id: string, updateStudentInput: Partial<UpdateStudentInput>) {
 
-    const {grades, ...studentDetails} = updateStudentDto;
+    const {grades, ...studentDetails} = updateStudentInput;
 
-    const student = await this.studentRepository.preload({
-      id:id,
-      ...studentDetails
-    })
+    // Buscar el estudiante primero
+    const student = await this.studentRepository.findOne({
+      where: { id },
+      relations: ['grade']
+    });
 
     if(!student) throw new NotFoundException(`Student with id ${id} not found`);
 
@@ -83,6 +84,9 @@ export class StudentsService {
     await queryRunner.startTransaction();
 
     try{
+      // Actualizar los campos del estudiante
+      Object.assign(student, studentDetails);
+
       if(grades){
         await queryRunner.manager.delete(Grade, {student:{id}});
         student.grade = grades.map(grade => this.gradeRepository.create(grade))
@@ -92,7 +96,11 @@ export class StudentsService {
       await queryRunner.commitTransaction();
       await queryRunner.release();
 
-      return this.findOne(id);
+      // Retornar el estudiante actualizado directamente
+      return await this.studentRepository.findOne({
+        where: { id },
+        relations: ['grade']
+      });
       
     }catch(error){
       await queryRunner.rollbackTransaction();

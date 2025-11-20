@@ -1,98 +1,273 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# GraphQL API - Sistema de Gestión de Estudiantes
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API GraphQL desarrollada con NestJS y PostgreSQL para la gestión de estudiantes y sus calificaciones. Incluye autenticación basada en JWT y control de roles.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Producción
 
-## Description
+La aplicación está desplegada y disponible en:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+**https://graph-api-kd2z.onrender.com/graphql**
 
-## Project setup
+## Descripción
+
+Esta API proporciona un sistema completo para administrar estudiantes, sus calificaciones y la autenticación de usuarios. Utiliza GraphQL como lenguaje de consulta, permitiendo a los clientes solicitar exactamente los datos que necesitan.
+
+### Características Principales
+
+- **Gestión de Estudiantes**: CRUD completo para estudiantes con información personal y académica
+- **Sistema de Calificaciones**: Registro y consulta de calificaciones por asignatura
+- **Autenticación JWT**: Sistema seguro de registro e inicio de sesión
+- **Control de Roles**: Protección de endpoints según roles de usuario
+- **Paginación**: Consultas optimizadas con límite y offset
+- **Seed de Datos**: Carga inicial de datos de prueba
+
+## Tecnologías
+
+- **NestJS**: Framework de Node.js para aplicaciones escalables
+- **GraphQL**: Apollo Server para API GraphQL
+- **TypeORM**: ORM para la gestión de base de datos
+- **PostgreSQL**: Base de datos relacional
+- **JWT**: Autenticación basada en tokens
+- **TypeScript**: Tipado estático para mayor seguridad
+
+## Estructura de la API
+
+### Queries
+
+- `students`: Obtener lista de estudiantes con paginación
+- `student(term)`: Buscar estudiante por término
+- `me`: Obtener información del usuario autenticado
+
+### Mutations
+
+- `register`: Registrar nuevo usuario
+- `login`: Iniciar sesión
+- `createStudent`: Crear nuevo estudiante
+- `updateStudent`: Actualizar información de estudiante
+- `removeStudent`: Eliminar estudiante
+- `executeSeed`: Ejecutar seed de datos
+
+### Tipos Principales
+
+**Student**
+- Información personal (nombre, edad, género, email)
+- Lista de asignaturas
+- Calificaciones por asignatura
+
+**User**
+- Datos de autenticación
+- Roles y permisos
+- Estado activo/inactivo
+
+**Grade**
+- Asignatura
+- Calificación numérica
+- Relación con estudiante
+
+## Requisitos Previos
+
+- Node.js 20.x
+- PostgreSQL 14 o superior
+- pnpm (recomendado) o npm
+
+## Configuración
+
+### 1. Clonar el Repositorio
 
 ```bash
-$ npm install
+git clone <repository-url>
+cd 2025-2-nest-graph
 ```
 
-## Compile and run the project
+### 2. Instalar Dependencias
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+pnpm install
 ```
 
-## Run tests
+### 3. Variables de Entorno
+
+Crear un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_contraseña
+DB_NAME=nest_graph_db
+
+JWT_SECRET=tu_secret_key_muy_segura
+
+PORT=3000
+```
+
+### 4. Base de Datos con Docker
+
+Iniciar PostgreSQL con Docker Compose:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker-compose up -d
 ```
 
-## Deployment
+Esto creará un contenedor de PostgreSQL con las credenciales configuradas en el archivo `.env`.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Ejecución
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Modo Desarrollo
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+pnpm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+La API estará disponible en: `http://localhost:3000/graphql`
 
-## Resources
+### Modo Producción
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+# Compilar el proyecto
+pnpm run build
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Ejecutar
+pnpm run start:prod
+```
 
-## Support
+### Modo Debug
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+pnpm run start:debug
+```
 
-## Stay in touch
+## Seed de Datos
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Para cargar datos de prueba en la base de datos, ejecutar la siguiente mutation en el playground de GraphQL:
 
-## License
+```graphql
+mutation {
+  executeSeed
+}
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Ejemplos de Uso
+
+### Registro de Usuario
+
+```graphql
+mutation {
+  register(createUserInput: {
+    email: "usuario@example.com"
+    fullName: "Usuario Ejemplo"
+    password: "password123"
+  }) {
+    token
+    user {
+      id
+      email
+      fullName
+      roles
+    }
+  }
+}
+```
+
+### Login
+
+```graphql
+mutation {
+  login(loginInput: {
+    email: "usuario@example.com"
+    password: "password123"
+  }) {
+    token
+    user {
+      id
+      email
+      fullName
+    }
+  }
+}
+```
+
+### Consultar Estudiantes
+
+```graphql
+query {
+  students(paginationArgs: { limit: 10, offset: 0 }) {
+    id
+    name
+    email
+    age
+    gender
+    subjects
+    grade {
+      subject
+      grade
+    }
+  }
+}
+```
+
+### Crear Estudiante
+
+```graphql
+mutation {
+  createStudent(createStudentInput: {
+    name: "Juan Pérez"
+    email: "juan@example.com"
+    gender: "M"
+    age: 20
+    subjects: ["Matemáticas", "Física", "Química"]
+    grades: [
+      { subject: "Matemáticas", grade: 4.5 }
+      { subject: "Física", grade: 4.0 }
+    ]
+  }) {
+    id
+    name
+    nickname
+    grade {
+      subject
+      grade
+    }
+  }
+}
+```
+
+## Testing
+
+```bash
+# Tests unitarios
+pnpm run test
+
+# Tests e2e
+pnpm run test:e2e
+
+# Cobertura de tests
+pnpm run test:cov
+```
+
+## Linting y Formato
+
+```bash
+# Ejecutar linter
+pnpm run lint
+
+# Formatear código
+pnpm run format
+```
+
+## Estructura del Proyecto
+
+```
+src/
+├── auth/              # Módulo de autenticación
+│   ├── decorators/    # Decoradores personalizados
+│   ├── guards/        # Guards de protección
+│   ├── strategies/    # Estrategias de autenticación
+│   └── entities/      # Entidad User
+├── students/          # Módulo de estudiantes
+│   ├── dto/           # Input types y args
+│   └── entities/      # Entidades Student y Grade
+├── seed/              # Módulo de carga de datos
+├── common/            # Recursos compartidos
+└── main.ts            # Punto de entrada
+```

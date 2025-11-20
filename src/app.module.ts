@@ -28,7 +28,10 @@ import { ConfigModule } from '@nestjs/config';
       database: process.env.DB_NAME || 'your_database',
       password: process.env.DB_PASSWORD || 'your_password',
       autoLoadEntities: true,
-      synchronize: true //Solo usarla en ambientes bajos, en prod hacer migraciones
+      synchronize: true, //Solo usarla en ambientes bajos, en prod hacer migraciones
+      ssl: {
+        rejectUnauthorized: false,
+      },
     }),
     StudentsModule,
     SeedModule,

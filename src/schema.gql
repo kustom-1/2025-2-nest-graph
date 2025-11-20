@@ -1,0 +1,89 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthResponse {
+  token: String!
+  user: User!
+}
+
+input CreateGradeInput {
+  grade: Float!
+  subject: String!
+}
+
+input CreateStudentInput {
+  age: Int
+  email: String!
+  gender: String!
+  grades: [CreateGradeInput!]
+  name: String!
+  subjects: [String!]!
+}
+
+input CreateUserInput {
+  email: String!
+  fullName: String!
+  password: String!
+}
+
+type Grade {
+  grade: Float!
+  id: ID!
+  student: Student
+  subject: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  createStudent(createStudentInput: CreateStudentInput!): Student!
+  executeSeed: String!
+  login(loginInput: LoginInput!): AuthResponse!
+  register(createUserInput: CreateUserInput!): AuthResponse!
+  removeStudent(id: ID!): Boolean!
+  updateStudent(updateStudentInput: UpdateStudentInput!): Student!
+}
+
+input PaginationArgs {
+  limit: Int = 10
+  offset: Int = 0
+}
+
+type Query {
+  me: User!
+  student(term: String!): Student!
+  students(paginationArgs: PaginationArgs): [Student!]!
+}
+
+type Student {
+  age: Float
+  email: String!
+  gender: String!
+  grade: [Grade!]!
+  id: ID!
+  name: String!
+  nickname: String!
+  subjects: [String!]!
+}
+
+input UpdateStudentInput {
+  age: Int
+  email: String
+  gender: String
+  grades: [CreateGradeInput!]
+  id: ID!
+  name: String
+  subjects: [String!]
+}
+
+type User {
+  email: String!
+  fullName: String!
+  id: ID!
+  isActive: Boolean!
+  roles: [String!]!
+}

@@ -1,4 +1,5 @@
 import { BadRequestException, CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { META_DATA } from 'src/auth/decorators/role-protected/role-protected.decorator';
@@ -17,7 +18,8 @@ export class UserRoleGuard implements CanActivate {
 
       if(!validRoles || validRoles.length === 0 ) return true;
 
-      const request = context.switchToHttp().getRequest();
+      const ctx = GqlExecutionContext.create(context);
+      const request = ctx.getContext().req;
       const user = request.user as User;
 
       if(!user) throw new BadRequestException(`User not found`);

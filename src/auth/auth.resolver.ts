@@ -3,11 +3,9 @@ import { AuthService } from './auth.service';
 import { CreateUserInput } from './dto/create-user.input';
 import { LoginInput } from './dto/login.input';
 import { AuthResponse } from './types/auth-response.type';
-import { UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { Auth } from './decorators/auth.decorator';
 import { GetUser } from './decorators/get-user.decorator';
 import { User } from './entities/user.entity';
-import { ValidRoles } from './enums/roles.enum';
 
 @Resolver()
 export class AuthResolver {
@@ -24,7 +22,7 @@ export class AuthResolver {
   }
 
   @Query(() => User, { name: 'me' })
-  @UseGuards(JwtAuthGuard)
+  @Auth()
   async me(@GetUser() user: User) {
     return user;
   }

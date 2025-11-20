@@ -4,14 +4,15 @@ import { Student } from './entities/student.entity';
 import { CreateStudentInput } from './dto/create-student.input';
 import { UpdateStudentInput } from './dto/update-student.input';
 import { PaginationArgs } from './dto/pagination.args';
-import { UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { ValidRoles } from '../auth/enums/roles.enum';
 
 @Resolver(() => Student)
 export class StudentsResolver {
   constructor(private readonly studentsService: StudentsService) {}
 
   @Mutation(() => Student, { name: 'createStudent' })
+  @Auth(ValidRoles.admin, ValidRoles.teacher)
   createStudent(
     @Args('createStudentInput') createStudentInput: CreateStudentInput,
   ) {
@@ -31,7 +32,7 @@ export class StudentsResolver {
   }
 
   @Mutation(() => Student, { name: 'updateStudent' })
-  @UseGuards(JwtAuthGuard)
+  @Auth(ValidRoles.admin, ValidRoles.teacher)
   updateStudent(
     @Args('updateStudentInput') updateStudentInput: UpdateStudentInput,
   ) {
@@ -40,6 +41,7 @@ export class StudentsResolver {
   }
 
   @Mutation(() => Boolean, { name: 'removeStudent' })
+  @Auth(ValidRoles.admin)
   async removeStudent(@Args('id', { type: () => ID }) id: string) {
     await this.studentsService.remove(id);
     return true;
